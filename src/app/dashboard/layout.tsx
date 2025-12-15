@@ -9,7 +9,9 @@ import {
     Package,
     FileText,
     LogOut,
-    BarChart
+    BarChart,
+    Shield,
+    Building
 } from "lucide-react";
 import { logout } from "@/actions/auth";
 
@@ -24,9 +26,9 @@ export default async function DashboardLayout({
         redirect("/login");
     }
 
-    const { organizationType } = session;
+    const { organizationType, role } = session;
 
-    const menus = {
+    const menus: Record<string, { label: string; icon: any; href: string }[]> = {
         RT: [
             { label: "Warga", icon: Users, href: "/dashboard/warga" },
             { label: "Iuran", icon: Wallet, href: "/dashboard/iuran" },
@@ -38,9 +40,18 @@ export default async function DashboardLayout({
             { label: "Pelanggan", icon: Users, href: "/dashboard/pelanggan" },
             { label: "Laporan", icon: BarChart, href: "/dashboard/laporan" },
         ],
+        SYSTEM: []
     };
 
-    const navItems = menus[organizationType as "RT" | "UMKM"] || [];
+    let navItems = menus[organizationType as string] || [];
+
+    if (role === "SUPER_ADMIN") {
+        navItems = [
+            ...navItems,
+            { label: "User Management", icon: Shield, href: "/dashboard/users" },
+            { label: "Organization Management", icon: Building, href: "/dashboard/organizations" }
+        ];
+    }
 
     return (
         <div className="flex h-screen bg-gray-100">

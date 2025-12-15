@@ -42,3 +42,20 @@ export async function updateSession(request: NextRequest) {
   });
   return response;
 }
+
+export async function verifyAPIToken(request: NextRequest) {
+  // 1. Check Authorization Header (Bearer Token) - for Mobile App / Postman
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    return await verifyJWT(token);
+  }
+
+  // 2. Check Session Cookie - for simple Browser API calls
+  const cookieToken = request.cookies.get("session")?.value;
+  if (cookieToken) {
+    return await verifyJWT(cookieToken);
+  }
+
+  return null;
+}

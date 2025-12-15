@@ -1,9 +1,8 @@
 "use server";
 
-import { PrismaClient, BillStatus } from "@prisma/client";
+import { createNewBill, getBillList, updateExistingBillStatus } from "../services/bill";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
+import { BillStatus } from "@prisma/client";
 
 export async function createBill(data: {
     organizationId: string;
@@ -12,15 +11,7 @@ export async function createBill(data: {
     amount: number;
 }) {
     try {
-        const bill = await prisma.bill.create({
-            data: {
-                organizationId: data.organizationId,
-                memberId: data.memberId,
-                period: data.period,
-                amount: data.amount,
-                status: "UNPAID",
-            },
-        });
+        const bill = await createNewBill(data);
         revalidatePath("/dashboard/iuran");
         return { success: true, data: bill };
     } catch (error: any) {
@@ -30,14 +21,7 @@ export async function createBill(data: {
 
 export async function updateBillStatus(id: string, status: BillStatus) {
     try {
-        const bill = await prisma.bill.update({
-            where: { id },
-            data: { status },
-        });
-
-        // Optional: If PAID, maybe create a Transaction record automatically?
-        // For now, keep it simple.
-
+        const bill = await updateExistingBillStatus(id, status);
         revalidatePath("/dashboard/iuran");
         return { success: true, data: bill };
     } catch (error: any) {
@@ -46,9 +30,5 @@ export async function updateBillStatus(id: string, status: BillStatus) {
 }
 
 export async function getBills(organizationId: string) {
-    return await prisma.bill.findMany({
-        where: { organizationId },
-        include: { member: true },
-        orderBy: { period: 'desc' }
-    });
+    return await getBillList(organizationId);
 }

@@ -1,9 +1,7 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { createNewMember, deleteExistingMember, getMemberList, updateExistingMember } from "../services/member";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
 
 export async function createMember(data: {
     organizationId: string;
@@ -13,15 +11,8 @@ export async function createMember(data: {
     notes?: string;
 }) {
     try {
-        const member = await prisma.member.create({
-            data: {
-                organizationId: data.organizationId,
-                name: data.name,
-                phone: data.phone,
-                address: data.address,
-                notes: data.notes,
-            },
-        });
+        const member = await createNewMember(data);
+        revalidatePath("/dashboard/pelanggan");
         return { success: true, data: member };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -35,15 +26,7 @@ export async function updateMember(id: string, data: {
     notes?: string;
 }) {
     try {
-        const member = await prisma.member.update({
-            where: { id },
-            data: {
-                name: data.name,
-                phone: data.phone,
-                address: data.address,
-                notes: data.notes,
-            },
-        });
+        const member = await updateExistingMember(id, data);
         revalidatePath("/dashboard/pelanggan");
         return { success: true, data: member };
     } catch (error: any) {
@@ -53,7 +36,7 @@ export async function updateMember(id: string, data: {
 
 export async function deleteMember(id: string) {
     try {
-        await prisma.member.delete({ where: { id } });
+        await deleteExistingMember(id);
         revalidatePath("/dashboard/pelanggan");
         return { success: true };
     } catch (error: any) {
@@ -62,8 +45,5 @@ export async function deleteMember(id: string) {
 }
 
 export async function getMembers(organizationId: string) {
-    return await prisma.member.findMany({
-        where: { organizationId },
-        orderBy: { name: 'asc' }
-    });
+    return await getMemberList(organizationId);
 }

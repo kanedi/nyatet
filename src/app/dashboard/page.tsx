@@ -9,6 +9,11 @@ export default async function DashboardPage() {
 
     if (!session) return null; // Handled in layout
 
+    if (session.role === "SUPER_ADMIN") {
+        const { redirect } = await import("next/navigation");
+        redirect("/dashboard/users");
+    }
+
     // If UMKM, show POS (Transaction Form)
     if (session.organizationType === "UMKM") {
         // Fetch data for POS

@@ -10,11 +10,13 @@ datasource db {
 enum OrganizationType {
   RT
   UMKM
+  SYSTEM
 }
 
 enum Role {
   ADMIN
   USER
+  SUPER_ADMIN
 }
 
 enum TransactionType {

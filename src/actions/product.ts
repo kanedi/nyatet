@@ -1,9 +1,7 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
+import { createNewProduct, deleteExistingProduct, getProductList, updateExistingProduct } from "../services/product";
 
 export async function createProduct(data: {
     organizationId: string;
@@ -15,17 +13,7 @@ export async function createProduct(data: {
     stock?: number;
 }) {
     try {
-        const product = await prisma.product.create({
-            data: {
-                organizationId: data.organizationId,
-                name: data.name,
-                price: data.price,
-                costPrice: data.costPrice || 0,
-                unit: data.unit,
-                isService: data.isService,
-                stock: data.isService ? 0 : data.stock || 0,
-            },
-        });
+        const product = await createNewProduct(data);
         revalidatePath("/dashboard/produk");
         return { success: true, data: product };
     } catch (error) {
@@ -42,17 +30,7 @@ export async function updateProduct(id: string, data: {
     stock?: number;
 }) {
     try {
-        const product = await prisma.product.update({
-            where: { id },
-            data: {
-                name: data.name,
-                price: data.price,
-                costPrice: data.costPrice || 0,
-                unit: data.unit,
-                isService: data.isService,
-                stock: data.isService ? 0 : data.stock || 0,
-            },
-        });
+        const product = await updateExistingProduct(id, data);
         revalidatePath("/dashboard/produk");
         return { success: true, data: product };
     } catch (error) {
@@ -62,7 +40,7 @@ export async function updateProduct(id: string, data: {
 
 export async function deleteProduct(id: string) {
     try {
-        await prisma.product.delete({ where: { id } });
+        await deleteExistingProduct(id);
         revalidatePath("/dashboard/produk");
         return { success: true };
     } catch (error) {
@@ -71,8 +49,5 @@ export async function deleteProduct(id: string) {
 }
 
 export async function getProducts(organizationId: string) {
-    return await prisma.product.findMany({
-        where: { organizationId },
-        orderBy: { name: 'asc' }
-    });
+    return await getProductList(organizationId);
 }
