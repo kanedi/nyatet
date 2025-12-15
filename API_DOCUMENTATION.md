@@ -1,60 +1,79 @@
-# API Documentation (Server Actions)
+# API Documentation
 
-This project uses Next.js Server Actions as the primary API layer. These functions are called directly from Client Components or Server Components to interact with the database.
+This project provides two ways to interact with the backend:
+1.  **Server Actions**: For Next.js Frontend (Direct DB Access).
+2.  **REST API**: For External Apps/Integrations (Protected by JWT).
 
-## Authentication (`src/actions/auth.ts`)
+## Authentication
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `login` | `prevState: any`, `formData: FormData` | `void` (redirects) or `{ message: string }` | Authenticates user via email/password. Uses custom JWT session cookie. |
-| `logout` | `void` | `void` (redirects) | Clears session cookie and redirects to login. |
+### Login
+**POST** `/api/login`
+-   **Body**: `{ "email": "...", "password": "..." }`
+-   **Response**: `{ "success": true, "token": "...", "user": { ... } }`
 
-## Products (`src/actions/product.ts`)
+Include the token in all subsequent requests:
+`Authorization: Bearer <TOKEN>`
 
-These actions manage the product catalog for "UMKM" mode.
+---
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `getProducts` | `organizationId: string` | `Promise<Product[]>` | Fetches all products for an organization. |
-| `createProduct` | `{ organizationId, name, price, unit, isService, costPrice?, stock? }` | `{ success: boolean, data?: Product, error?: string }` | Creates a new product. |
-| `updateProduct` | `id: string`, `{ name, price, unit, isService, costPrice?, stock? }` | `{ success: boolean, data?: Product, error?: string }` | Updates an existing product. |
-| `deleteProduct` | `id: string` | `{ success: boolean, error?: string }` | Deletes a product. |
+## Standard REST Endpoints (`src/app/api/*`)
 
-## Members / Warga (`src/actions/member.ts`)
+All endpoints below require Authentication.
 
-Manage members (Warga/Pelanggan) for both "RT" and "UMKM" modes.
+### Products (`/api/products`)
+-   `GET ?organizationId=...`: List products.
+-   `POST`: Create product. Body: `{ "organizationId", "name", "price", "unit" ... }`
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `getMembers` | `organizationId: string` | `Promise<Member[]>` | Fetches all members. |
-| `createMember` | `{ organizationId, name, phone?, address?, notes? }` | `{ success: boolean, data?: Member, error?: string }` | Creates a new member. |
-| `updateMember` | `id: string`, `{ name, phone?, address?, notes? }` | `{ success: boolean, data?: Member, error?: string }` | Updates an existing member. |
-| `deleteMember` | `id: string` | `{ success: boolean, error?: string }` | Deletes a member. |
+### Members (`/api/members`)
+-   `GET ?organizationId=...`: List members.
+-   `POST`: Create member. Body: `{ "organizationId", "name", "phone" ... }`
 
-## Transactions (`src/actions/transaction.ts`)
+### Transactions (`/api/transactions`)
+-   `GET ?organizationId=...`: List transactions.
+-   `POST`: Create transaction. Body: `{ "organizationId", "type", "items": [...] }`
 
-Handles POS transactions.
+### Bills (`/api/bills`)
+-   `GET ?organizationId=...`: List bills.
+-   `POST`: Create/Update Bill.
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `createTransaction` | `{ organizationId, memberId?, type: "INCOME"\|"EXPENSE", items: { productId, quantity, priceAtSale }[] }` | `{ success: boolean, data?: Transaction, error?: string }` | Records a transaction, calculates total, snapshots cost, and updates stock (if applicable). |
-| `getTransactions` | `organizationId: string` | `Promise<Transaction[]>` | Fetches recent transactions with member and item details. |
+### Reports (`/api/reports/*`)
+-   `GET /financial?organizationId=...`: Revenue summary.
+-   `GET /sales?organizationId=...`: Product sales summary.
 
-## Reports (`src/actions/report.ts`)
+### User Management (Admin Only) (`/api/admin/users`)
+-   `GET`: List all users.
+-   `POST`: Create user.
+-   `DELETE ?id=...`: Delete user.
 
-Aggregates data for analytics.
+---
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `getFinancialSummary` | `organizationId: string`, `period: "day"\|"month"`, `date: Date` | `Promise<FinancialSummary>` | Returns Revenue, Cost, Profit, and Transaction Count. |
-| `getProductSalesSummary` | `organizationId: string`, `period: "day"\|"month"`, `date: Date` | `Promise<ProductSalesSummary[]>` | Returns quantity and revenue per product. |
+## Server Actions (`src/actions/*`)
 
-## Bills / Iuran (`src/actions/bill.ts`)
+Used internally by the Next.js Frontend.
 
-Manages recurring bills or dues (primarily for "RT" mode).
+### Auth (`auth.ts`)
+-   `login`: Authenticates user & sets session cookie.
+-   `logout`: Clears session.
 
-| Action | Input | Output | Description |
-| :--- | :--- | :--- | :--- |
-| `getBills` | `organizationId: string` | `Promise<Bill[]>` | Fetches all bills. |
-| `createBill` | `{ organizationId, memberId, period, amount }` | `{ success: boolean, data?: Bill, error?: string }` | Creates a bill record. |
-| `updateBillStatus` | `id: string`, `status: BillStatus` | `{ success: boolean, data?: Bill, error?: string }` | Updates bill status (e.g., UNPAID -> PAID). |
+### Organization (`organization.ts`)
+-   `getOrganizationsAction`: List all orgs.
+-   `createOrganizationAction`: Create new org (Super Admin).
+-   `updateOrganizationAction`: Update org (Super Admin).
+-   `deleteOrganizationAction`: Delete org (Super Admin).
+
+### User (`user.ts`)
+-   `createUserAction`: Create new user (Super Admin).
+-   `updateUserAction`: Update user (Super Admin).
+-   `deleteUserAction`: Delete user (Super Admin).
+
+### Products (`product.ts`)
+-   `getProducts`, `createProduct`, `updateProduct`, `deleteProduct`.
+
+### Members (`member.ts`)
+-   `getMembers`, `createMember`, `updateMember`, `deleteMember`.
+
+### Transactions (`transaction.ts`)
+-   `createTransaction`, `getTransactions`.
+
+### Reports (`report.ts`)
+-   `getFinancialSummary`, `getProductSalesSummary`.
