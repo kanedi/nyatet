@@ -21,19 +21,28 @@ Include the token in all subsequent requests:
 All endpoints below require Authentication.
 
 ### Products (`/api/products`)
--   `GET ?organizationId=...`: List products.
+-   `GET`: List products.
+    - Path params: none
+    - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
+    - Response: `{ data: Product[], meta: { total, page, limit, totalPages } }`
 -   `POST`: Create product. Body: `{ "organizationId", "name", "price", "unit" ... }`
 
 ### Members (`/api/members`)
--   `GET ?organizationId=...`: List members.
+-   `GET`: List members.
+    - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
+    - Response: `{ data: Member[], meta: { total, page, limit, totalPages } }`
 -   `POST`: Create member. Body: `{ "organizationId", "name", "phone" ... }`
 
 ### Transactions (`/api/transactions`)
--   `GET ?organizationId=...`: List transactions.
+-   `GET`: List transactions.
+    - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
+    - Response: `{ data: Transaction[], meta: { total, page, limit, totalPages } }`
 -   `POST`: Create transaction. Body: `{ "organizationId", "type", "items": [...] }`
 
 ### Bills (`/api/bills`)
--   `GET ?organizationId=...`: List bills.
+-   `GET`: List bills.
+    - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
+    - Response: `{ data: Bill[], meta: { total, page, limit, totalPages } }`
 -   `POST`: Create/Update Bill.
 
 ### Reports (`/api/reports/*`)
@@ -67,13 +76,16 @@ Used internally by the Next.js Frontend.
 -   `deleteUserAction`: Delete user (Super Admin).
 
 ### Products (`product.ts`)
--   `getProducts`, `createProduct`, `updateProduct`, `deleteProduct`.
+-   `getProducts(orgId, page, search)`, `createProduct`, `updateProduct`, `deleteProduct`.
 
 ### Members (`member.ts`)
--   `getMembers`, `createMember`, `updateMember`, `deleteMember`.
+-   `getMembers(orgId, page, search)`, `createMember`, `updateMember`, `deleteMember`.
 
 ### Transactions (`transaction.ts`)
--   `createTransaction`, `getTransactions`.
+-   `createTransaction`, `getTransactions(orgId, page, search)`.
+
+### Bills (`bill.ts`)
+-   `createBill`, `getBills(orgId, page, search)`, `updateBillStatus`, `generateMonthlyBills`.
 
 ### Reports (`report.ts`)
 -   `getFinancialSummary`, `getProductSalesSummary`.

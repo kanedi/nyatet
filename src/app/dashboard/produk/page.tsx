@@ -8,12 +8,17 @@ import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { EditProductDialog } from "@/components/EditProductDialog";
 import { redirect } from "next/navigation";
+import { PaginationControls } from "@/components/PaginationControls";
+import { SearchInput } from "@/components/SearchInput";
 
-export default async function ProductsPage() {
+export default async function ProductsPage(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+    const searchParams = await props.searchParams;
     const session = await getSession();
     if (!session) redirect("/login");
 
-    const products = await getProducts(session.organizationId as string);
+    const currentPage = parseInt(searchParams?.page || "1");
+    const query = searchParams?.q || "";
+    const { data: products, meta } = await getProducts(session.organizationId as string, currentPage, query);
 
     async function create(formData: FormData) {
         "use server";
@@ -43,6 +48,10 @@ export default async function ProductsPage() {
     return (
         <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">Manajemen Produk</h2>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Cari nama produk..." />
+            </div>
 
             {/* Create Form */}
             <Card>
@@ -125,6 +134,7 @@ export default async function ProductsPage() {
                             )}
                         </TableBody>
                     </Table>
+                    <PaginationControls totalPages={meta.totalPages} currentPage={meta.page} />
                 </CardContent>
             </Card>
         </div>

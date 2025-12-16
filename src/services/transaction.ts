@@ -81,14 +81,75 @@ export async function createNewTransaction(data: {
     });
 }
 
-export async function getTransactionList(organizationId: string) {
-    return await prisma.transaction.findMany({
-        where: { organizationId },
-        include: {
-            member: { select: { name: true } },
-            items: { include: { product: { select: { name: true } } } }
+export async function getTransactionList(organizationId: string, page: number = 1, limit: number = 20, search?: string) {
+    const skip = (page - 1) * limit;
+    const whereClause: any = { organizationId };
+
+    if (search) {
+        whereClause.OR = [
+            { description: { contains: search, mode: 'insensitive' } },
+            { member: { name: { contains: search, mode: 'insensitive' } } }
+        ];
+    }
+
+    const [data, total] = await Promise.all([
+        prisma.transaction.findMany({
+            where: whereClause,
+            include: {
+                member: { select: { name: true } },
+                items: { include: { product: { select: { name: true } } } }
+            },
+            orderBy: { date: 'desc' },
+            take: limit,
+            skip
+        }),
+        prisma.transaction.count({ where: whereClause })
+    ]);
+
+    return {
+        data,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
+}
+
+export async function createCashTransactionService(data: {
+    organizationId: string;
+    type: "INCOME" | "EXPENSE";
+    amount: number;
+    description: string;
+    date: Date;
+}) {
+    return await prisma.transaction.create({
+        data: {
+            organizationId: data.organizationId,
+            type: data.type,
+            totalAmount: data.amount,
+            date: data.date,
+            description: data.description,
         },
-        orderBy: { date: 'desc' },
-        take: 20
     });
+}
+
+export async function getTransactionStats(organizationId: string) {
+    const stats = await prisma.transaction.groupBy({
+        by: ['type'],
+        where: { organizationId },
+        _sum: {
+            totalAmount: true,
+        },
+    });
+
+    const income = stats.find(s => s.type === 'INCOME')?._sum.totalAmount || 0;
+    const expense = stats.find(s => s.type === 'EXPENSE')?._sum.totalAmount || 0;
+
+    return {
+        totalIncome: income,
+        totalExpense: expense,
+        balance: income - expense
+    };
 }

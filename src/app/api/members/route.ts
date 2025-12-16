@@ -10,6 +10,9 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const organizationId = searchParams.get("organizationId");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("q") || undefined;
 
     if (!organizationId) {
         return NextResponse.json({ error: "Organization ID is required" }, { status: 400 });
@@ -20,8 +23,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const members = await getMemberList(organizationId);
-        return NextResponse.json(members);
+        const result = await getMemberList(organizationId, page, limit, search);
+        return NextResponse.json(result);
     } catch (error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

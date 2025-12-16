@@ -47,9 +47,34 @@ export async function deleteExistingProduct(id: string) {
     return await prisma.product.delete({ where: { id } });
 }
 
-export async function getProductList(organizationId: string) {
-    return await prisma.product.findMany({
-        where: { organizationId },
-        orderBy: { name: 'asc' }
-    });
+export async function getProductList(organizationId: string, page: number = 1, limit: number = 10, search?: string) {
+    const skip = (page - 1) * limit;
+    const whereClause: any = { organizationId };
+
+    if (search) {
+        whereClause.OR = [
+            { name: { contains: search, mode: 'insensitive' } },
+            { unit: { contains: search, mode: 'insensitive' } },
+        ];
+    }
+
+    const [data, total] = await Promise.all([
+        prisma.product.findMany({
+            where: whereClause,
+            orderBy: { name: 'asc' },
+            take: limit,
+            skip
+        }),
+        prisma.product.count({ where: whereClause })
+    ]);
+
+    return {
+        data,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        }
+    };
 }

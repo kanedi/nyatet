@@ -1,6 +1,6 @@
 "use server";
 
-import { createNewTransaction, getTransactionList } from "../services/transaction";
+import { createNewTransaction, getTransactionList, createCashTransactionService, getTransactionStats } from "../services/transaction";
 import { revalidatePath } from "next/cache";
 import { getMemberList } from "../services/member";
 import { getProductList } from "../services/product";
@@ -35,12 +35,32 @@ export async function createTransaction(data: {
 }
 
 export async function getMembers(organizationId: string) {
-    return await getMemberList(organizationId);
+    return await getMemberList(organizationId, 1, 1000);
 }
 
 export async function getProducts(organizationId: string) {
-    return await getProductList(organizationId);
+    return await getProductList(organizationId, 1, 1000);
 }
-export async function getTransactions(organizationId: string) {
-    return await getTransactionList(organizationId);
+export async function getTransactions(organizationId: string, page: number = 1, search?: string) {
+    return await getTransactionList(organizationId, page, 20, search);
+}
+
+export async function createCashTransaction(data: {
+    organizationId: string;
+    type: "INCOME" | "EXPENSE";
+    amount: number;
+    description: string;
+    date: Date;
+}) {
+    try {
+        const result = await createCashTransactionService(data);
+        revalidatePath("/dashboard/kas");
+        return { success: true, data: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : "Error" };
+    }
+}
+
+export async function getStats(organizationId: string) {
+    return await getTransactionStats(organizationId);
 }

@@ -9,13 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { redirect } from "next/navigation";
+import { GenerateBillDialog } from "@/components/GenerateBillDialog";
+import { PaginationControls } from "@/components/PaginationControls";
+import { SearchInput } from "@/components/SearchInput";
 
-export default async function IuranPage() {
+export default async function IuranPage(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+    const searchParams = await props.searchParams;
     const session = await getSession();
     if (!session) redirect("/login");
 
-    const bills = await getBills(session.organizationId as string);
-    const members = await getMembers(session.organizationId as string);
+    const currentPage = parseInt(searchParams?.page || "1");
+    const query = searchParams?.q || "";
+    const { data: bills, meta } = await getBills(session.organizationId as string, currentPage, query);
+    const { data: members } = await getMembers(session.organizationId as string);
 
     async function create(formData: FormData) {
         "use server";
@@ -39,7 +45,14 @@ export default async function IuranPage() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight">Iuran Warga</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold tracking-tight">Iuran Warga</h2>
+                <GenerateBillDialog organizationId={session!.organizationId as string} />
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Cari nama warga..." />
+            </div>
 
             {/* Create Form */}
             <Card>
@@ -118,6 +131,7 @@ export default async function IuranPage() {
                             )}
                         </TableBody>
                     </Table>
+                    <PaginationControls totalPages={meta.totalPages} currentPage={meta.page} />
                 </CardContent>
             </Card>
         </div>

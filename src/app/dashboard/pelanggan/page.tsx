@@ -8,11 +8,17 @@ import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { redirect } from "next/navigation";
 
-export default async function MembersPage() {
+import { PaginationControls } from "@/components/PaginationControls";
+import { SearchInput } from "@/components/SearchInput";
+
+export default async function MembersPage(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+    const searchParams = await props.searchParams;
     const session = await getSession();
     if (!session) redirect("/login");
 
-    const members = await getMembers(session.organizationId as string);
+    const currentPage = parseInt(searchParams?.page || "1");
+    const query = searchParams?.q || "";
+    const { data: members, meta } = await getMembers(session.organizationId as string, currentPage, query);
 
     async function create(formData: FormData) {
         "use server";
@@ -36,6 +42,10 @@ export default async function MembersPage() {
     return (
         <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tight">Manajemen Pelanggan</h2>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Cari nama, hp, alamat..." />
+            </div>
 
             {/* Create Form */}
             <Card>
@@ -95,6 +105,7 @@ export default async function MembersPage() {
                             )}
                         </TableBody>
                     </Table>
+                    <PaginationControls totalPages={meta.totalPages} currentPage={meta.page} />
                 </CardContent>
             </Card>
         </div>

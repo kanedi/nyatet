@@ -48,6 +48,6 @@ export async function deleteProduct(id: string) {
     }
 }
 
-export async function getProducts(organizationId: string) {
-    return await getProductList(organizationId);
+export async function getProducts(organizationId: string, page: number = 1, search?: string) {
+    return await getProductList(organizationId, page, 10, search);
 }

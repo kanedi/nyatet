@@ -29,6 +29,8 @@ src/
 │   ├── AddOrganizationDialog.tsx # Org Management UI
 │   ├── EditOrganizationDialog.tsx
 │   ├── OrganizationListTable.tsx
+│   ├── SearchInput.tsx           # Reusable Search Bar
+│   ├── PaginationControls.tsx    # Reusable Pagination Buttons
 │   └── ...
 └── lib/            # Utilities (Auth, Helpers)
 ```

@@ -17,10 +17,10 @@ export default async function DashboardPage() {
     // If UMKM, show POS (Transaction Form)
     if (session.organizationType === "UMKM") {
         // Fetch data for POS
-        const members = await getMembers(session.organizationId as string);
-        const products = await getProducts(session.organizationId as string);
+        const { data: members } = await getMembers(session.organizationId as string);
+        const { data: products } = await getProducts(session.organizationId as string);
 
-        const transactions = await getTransactions(session.organizationId as string);
+        const { data: transactions } = await getTransactions(session.organizationId as string);
 
         // Filter products for dropdown (or pass logic to component)
         // TransactionForm expects plain products.

@@ -44,6 +44,6 @@ export async function deleteMember(id: string) {
     }
 }
 
-export async function getMembers(organizationId: string) {
-    return await getMemberList(organizationId);
+export async function getMembers(organizationId: string, page: number = 1, search?: string) {
+    return await getMemberList(organizationId, page, 10, search);
 }

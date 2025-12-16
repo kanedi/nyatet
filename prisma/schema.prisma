@@ -83,6 +83,7 @@ model Transaction {
   type           TransactionType
   totalAmount    Float
   date           DateTime          @default(now())
+  description    String?
   organization   Organization      @relation(fields: [organizationId], references: [id])
   member         Member?           @relation(fields: [memberId], references: [id])
   items          TransactionItem[]

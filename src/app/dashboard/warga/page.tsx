@@ -8,19 +8,24 @@ import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import { EditMemberDialog } from "@/components/EditMemberDialog";
 import { redirect } from "next/navigation";
+import { PaginationControls } from "@/components/PaginationControls";
+import { SearchInput } from "@/components/SearchInput";
 
-export default async function WargaPage() {
+export default async function WargaPage(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+    const searchParams = await props.searchParams;
     const session = await getSession();
     if (!session) redirect("/login");
 
-    const members = await getMembers(session.organizationId as string);
+    const currentPage = parseInt(searchParams?.page || "1");
+    const query = searchParams?.q || "";
+    const { data: members, meta } = await getMembers(session.organizationId as string, currentPage, query);
 
     async function create(formData: FormData) {
         "use server";
         const name = formData.get("name") as string;
         const phone = formData.get("phone") as string;
         const address = formData.get("address") as string;
-        const notes = formData.get("notes") as string; // additional for RT
+        const notes = formData.get("notes") as string;
 
         await createMember({
             organizationId: session!.organizationId as string,
@@ -38,7 +43,13 @@ export default async function WargaPage() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-3xl font-bold tracking-tight">Data Warga</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold tracking-tight">Data Warga</h2>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Cari nama, hp, alamat..." />
+            </div>
 
             {/* Create Form */}
             <Card>
@@ -107,6 +118,7 @@ export default async function WargaPage() {
                             )}
                         </TableBody>
                     </Table>
+                    <PaginationControls totalPages={meta.totalPages} currentPage={meta.page} />
                 </CardContent>
             </Card>
         </div>
