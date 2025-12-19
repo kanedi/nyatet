@@ -25,7 +25,9 @@ src/
 │   ├── ui/         # Reusable UI Components (shadcn/ui)
 │   ├── AddUserDialog.tsx        # User Management UI
 │   ├── EditUserDialog.tsx
+│   ├── EditUserDialog.tsx
 │   ├── UserListTable.tsx
+│   ├── SendMessageDialog.tsx     # Telegram Message Internal Tool
 │   ├── AddOrganizationDialog.tsx # Org Management UI
 │   ├── EditOrganizationDialog.tsx
 │   ├── OrganizationListTable.tsx
@@ -64,12 +66,13 @@ src/
 
 ### User Management
 -   **Route**: `/dashboard/users`
--   **Components**: `UserListTable`, `AddUserDialog`, `EditUserDialog`.
+-   **Components**: `UserListTable` (includes `SendMessageDialog`), `AddUserDialog`, `EditUserDialog`.
 -   **Features**:
     -   List all users with Role/Org details.
     -   Create new users (assign Role & Org).
-    -   Edit user Role/Org/Password.
+    -   Edit user Role/Org/Password/**Telegram ID**.
     -   Delete users.
+    -   **Telegram Integration**: Send direct messages to users via Bot.
 
 ### Organization Management
 -   **Route**: `/dashboard/organizations`
@@ -85,3 +88,11 @@ src/
 -   **Public Routes**: `/`, `/login`
 -   **Protected Routes**: all routes under `/dashboard/*`
 -   **Sidebar**: Defined in `src/app/dashboard/layout.tsx`. Logic handles `SUPER_ADMIN` role to show unique administrative menus.
+
+## Telegram Integration
+
+A guide is available at `TELEGRAM_GUIDE.md`.
+
+-   **Setup**: Input `Telegram ID` in User Management.
+-   **Daily Report**: Triggered via Cron `/api/cron/daily-report`.
+-   **Manual Trigger**: Available in "Laporan" page (Send to Telegram button).

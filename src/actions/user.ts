@@ -24,6 +24,7 @@ export async function updateUserAction(id: string, data: {
     password?: string;
     role?: Role;
     organizationId?: string;
+    telegramChatId?: string;
 }) {
     try {
         const user = await updateExistingUser(id, data);

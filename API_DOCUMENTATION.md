@@ -37,7 +37,7 @@ All endpoints below require Authentication.
 -   `GET`: List transactions.
     - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
     - Response: `{ data: Transaction[], meta: { total, page, limit, totalPages } }`
--   `POST`: Create transaction. Body: `{ "organizationId", "type", "items": [...] }`
+-   `POST`: Create transaction. Body: `{ "organizationId", "type", "paymentMethod" ("CASH"|"TRANSFER"), "items": [...] }`
 
 ### Bills (`/api/bills`)
 -   `GET`: List bills.
@@ -53,6 +53,10 @@ All endpoints below require Authentication.
 -   `GET`: List all users.
 -   `POST`: Create user.
 -   `DELETE ?id=...`: Delete user.
+
+### Telegram Cron (`/api/cron/daily-report`)
+-   `GET`: Triggers daily report sending to all connected admins.
+-   **Security**: Should be protected by secret header in production (currently open).
 
 ---
 
@@ -74,6 +78,10 @@ Used internally by the Next.js Frontend.
 -   `createUserAction`: Create new user (Super Admin).
 -   `updateUserAction`: Update user (Super Admin).
 -   `deleteUserAction`: Delete user (Super Admin).
+
+### Telegram (`telegram.ts`, `report-trigger.ts`)
+-   `sendMessageAction(chatId, message)`: Send custom text message.
+-   `sendReportAction(period)`: Manually trigger report (day/month).
 
 ### Products (`product.ts`)
 -   `getProducts(orgId, page, search)`, `createProduct`, `updateProduct`, `deleteProduct`.

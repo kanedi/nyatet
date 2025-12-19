@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
             organizationId: body.organizationId,
             memberId: body.memberId, // Optional
             type: body.type || "INCOME",
+            paymentMethod: body.paymentMethod || "CASH",
             date: body.date ? new Date(body.date) : new Date(),
             items: body.items,
         });

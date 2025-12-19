@@ -4,6 +4,7 @@ export async function createNewTransaction(data: {
     organizationId: string;
     memberId?: string;
     type: "INCOME" | "EXPENSE";
+    paymentMethod: "CASH" | "TRANSFER";
     date: Date;
     items: {
         productId: string;
@@ -31,6 +32,7 @@ export async function createNewTransaction(data: {
                 organizationId: data.organizationId,
                 memberId: data.memberId,
                 type: data.type,
+                paymentMethod: data.paymentMethod,
                 totalAmount,
                 date: data.date,
                 items: {

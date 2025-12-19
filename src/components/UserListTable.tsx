@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { deleteUserAction } from "@/actions/user";
 import { Edit, Trash2 } from "lucide-react";
 import { EditUserDialog } from "./EditUserDialog";
+import { SendMessageDialog } from "./SendMessageDialog";
 
 export function UserListTable({ users }: { users: any[] }) {
     const [editingUser, setEditingUser] = useState<any>(null);
@@ -41,6 +42,7 @@ export function UserListTable({ users }: { users: any[] }) {
                                 <Button variant="ghost" size="sm" onClick={() => setEditingUser(user)}>
                                     <Edit className="h-4 w-4 text-blue-500" />
                                 </Button>
+                                <SendMessageDialog chatName={user.email} chatId={user.telegramChatId} />
                                 <Button variant="ghost" size="sm" onClick={() => handleDelete(user.id, user.email)}>
                                     <Trash2 className="h-4 w-4 text-red-500" />
                                 </Button>

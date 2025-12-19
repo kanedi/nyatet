@@ -21,6 +21,7 @@ export function EditUserDialog({ user, open, onOpenChange }: {
     const [password, setPassword] = useState("");
     const [role, setRole] = useState(user.role);
     const [organizationId, setOrganizationId] = useState(user.organizationId);
+    const [telegramChatId, setTelegramChatId] = useState(user.telegramChatId || "");
 
     useEffect(() => {
         if (open) {
@@ -32,6 +33,7 @@ export function EditUserDialog({ user, open, onOpenChange }: {
             // Reset form to user values
             setRole(user.role);
             setOrganizationId(user.organizationId);
+            setTelegramChatId(user.telegramChatId || "");
             setPassword("");
         }
     }, [open, user]);
@@ -43,7 +45,8 @@ export function EditUserDialog({ user, open, onOpenChange }: {
         const res = await updateUserAction(user.id, {
             password: password || undefined, // Only send if set
             role: role as "USER" | "ADMIN" | "SUPER_ADMIN",
-            organizationId
+            organizationId,
+            telegramChatId: telegramChatId || undefined
         });
 
         setLoading(false);
@@ -101,6 +104,10 @@ export function EditUserDialog({ user, open, onOpenChange }: {
                                     </SelectContent>
                                 </Select>
                             </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-telegram" className="text-right">Telegram ID</Label>
+                            <Input id="edit-telegram" value={telegramChatId} onChange={e => setTelegramChatId(e.target.value)} className="col-span-3" type="text" placeholder="e.g. 123456789" />
                         </div>
                     </div>
                     <DialogFooter>

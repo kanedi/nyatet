@@ -17,6 +17,7 @@ export async function createTransaction(data: {
     organizationId: string;
     memberId?: string;
     type: "INCOME" | "EXPENSE";
+    paymentMethod: "CASH" | "TRANSFER";
     date: Date;
     items: {
         productId: string;

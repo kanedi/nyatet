@@ -27,6 +27,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const formSchema = z.object({
     memberId: z.string().optional(),
+    paymentMethod: z.enum(["CASH", "TRANSFER"]),
     items: z.array(
         z.object({
             productId: z.string().min(1, "Product is required"),
@@ -46,6 +47,7 @@ export function TransactionForm({ organizationId, members, products }: Transacti
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            paymentMethod: "CASH",
             items: [{ productId: "", quantity: 1, priceAtSale: 0 }],
         },
     });
@@ -67,6 +69,7 @@ export function TransactionForm({ organizationId, members, products }: Transacti
             organizationId,
             memberId: values.memberId || undefined,
             type: "INCOME", // Default to INCOME for POS
+            paymentMethod: values.paymentMethod,
             date: new Date(),
             items: values.items.map((i) => ({
                 productId: i.productId,
@@ -109,6 +112,28 @@ export function TransactionForm({ organizationId, members, products }: Transacti
                                                     {m.name}
                                                 </SelectItem>
                                             ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="paymentMethod"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Payment Method</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Payment Method" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="CASH">Cash</SelectItem>
+                                            <SelectItem value="TRANSFER">Transfer</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

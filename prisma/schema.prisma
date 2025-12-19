@@ -48,6 +48,7 @@ model User {
   email          String       @unique
   password       String
   role           Role         @default(USER)
+  telegramChatId String?
   organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
@@ -81,12 +82,18 @@ model Transaction {
   organizationId String
   memberId       String?
   type           TransactionType
+  paymentMethod  PaymentMethod     @default(CASH)
   totalAmount    Float
   date           DateTime          @default(now())
   description    String?
   organization   Organization      @relation(fields: [organizationId], references: [id])
   member         Member?           @relation(fields: [memberId], references: [id])
   items          TransactionItem[]
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
 }
 
 model TransactionItem {

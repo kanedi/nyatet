@@ -33,6 +33,7 @@ export async function updateExistingUser(id: string, data: {
     password?: string;
     role?: Role;
     organizationId?: string;
+    telegramChatId?: string;
 }) {
     return await prisma.user.update({
         where: { id },
@@ -40,6 +41,7 @@ export async function updateExistingUser(id: string, data: {
             ...(data.password && { password: data.password }),
             ...(data.role && { role: data.role }),
             ...(data.organizationId && { organizationId: data.organizationId }),
+            ...(data.telegramChatId && { telegramChatId: data.telegramChatId }),
         },
     });
 }
