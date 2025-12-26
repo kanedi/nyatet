@@ -33,6 +33,11 @@ src/
 │   ├── OrganizationListTable.tsx
 │   ├── SearchInput.tsx           # Reusable Search Bar
 │   ├── PaginationControls.tsx    # Reusable Pagination Buttons
+│   ├── CashierView.tsx           # Cashier Layout Manager
+│   ├── TransactionForm.tsx       # POS Transaction Entry
+│   ├── QuickActionsCard.tsx      # Sidebar Quick Add Wrapper
+│   ├── QuickAddMemberForm.tsx    # Fast Member Creation
+│   ├── QuickAddProductForm.tsx   # Fast Product Creation
 │   └── ...
 └── lib/            # Utilities (Auth, Helpers)
 ```
@@ -47,7 +52,10 @@ src/
 
 2.  **UMKM Mode**: For Small Business management.
     -   Menu: Kasir, Produk, Pelanggan, Laporan.
-    -   Overview: POS (Point of Sales).
+    -   Overview: POS (Point of Sales). Features:
+        -   **Cashier View**: Grid layout with "New Transaction" form and "Quick Actions" side-by-side.
+        -   **Quick Actions**: Tabs to quickly add "Member" (Customer) and "Product" (including Cost Price) without leaving the POS.
+        -   **Transaction History**: Searchable and paginated list of recent transactions.
 
 3.  **SYSTEM Mode (Super Admin)**: For System Administration.
     -   Menu: User Management, Organization Management.

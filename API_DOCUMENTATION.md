@@ -25,7 +25,7 @@ All endpoints below require Authentication.
     - Path params: none
     - Query params: `organizationId` (required), `page` (default 1), `limit` (default 10), `q` (search term).
     - Response: `{ data: Product[], meta: { total, page, limit, totalPages } }`
--   `POST`: Create product. Body: `{ "organizationId", "name", "price", "unit" ... }`
+-   `POST`: Create product. Body: `{ "organizationId", "name", "price", "costPrice" (optional), "unit" ... }`
 
 ### Members (`/api/members`)
 -   `GET`: List members.
