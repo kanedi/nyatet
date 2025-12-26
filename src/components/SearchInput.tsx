@@ -1,45 +1,38 @@
 "use client";
 
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
-import { useState } from "react";
 
-export function SearchInput({ placeholder = "Search..." }: { placeholder?: string }) {
+export function SearchInput({ placeholder, queryParam = "search" }: { placeholder: string, queryParam?: string }) {
     const searchParams = useSearchParams();
-    const router = useRouter();
-    const [term, setTerm] = useState(searchParams.get('q')?.toString() || "");
+    const pathname = usePathname();
+    const { replace } = useRouter();
 
-    const handleSearch = () => {
+    const handleSearch = useDebouncedCallback((term: string) => {
         const params = new URLSearchParams(searchParams);
-        params.set('page', '1');
+        params.set("page", "1");
         if (term) {
-            params.set('q', term);
+            params.set(queryParam, term);
         } else {
-            params.delete('q');
+            params.delete(queryParam);
         }
-        router.replace(`?${params.toString()}`);
-    };
+        replace(`${pathname}?${params.toString()}`);
+    }, 300);
 
     return (
-        <div className="flex w-full md:w-auto items-center gap-2">
-            <div className="relative w-full md:w-[300px]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    type="search"
-                    placeholder={placeholder}
-                    className="pl-8 w-full"
-                    value={term}
-                    onChange={(e) => setTerm(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            handleSearch();
-                        }
-                    }}
-                />
-            </div>
-            <Button onClick={handleSearch}>Cari</Button>
+        <div className="relative flex-1 flex-shrink-0">
+            <label htmlFor="search" className="sr-only">
+                Search
+            </label>
+            <Input
+                className="pl-10 peer block w-full rounded-md border border-gray-200 py-[9px] text-sm outline-2 placeholder:text-gray-500"
+                placeholder={placeholder}
+                onChange={(e) => handleSearch(e.target.value)}
+                defaultValue={searchParams.get(queryParam)?.toString()}
+            />
+            <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
         </div>
     );
 }

@@ -52,6 +52,8 @@ export default async function DashboardLayout({
                 organizationType={String(organizationType)}
                 navItems={navItems}
                 logoutAction={logout}
+                userEmail={session.email as string}
+                userRole={role as string}
             />
 
             {/* Main Content */}

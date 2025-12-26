@@ -50,7 +50,7 @@ export default async function ProductsPage(props: { searchParams: Promise<{ page
             <h2 className="text-3xl font-bold tracking-tight">Manajemen Produk</h2>
 
             <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Cari nama produk..." />
+                <SearchInput placeholder="Cari nama produk..." queryParam="q" />
             </div>
 
             {/* Create Form */}

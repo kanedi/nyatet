@@ -3,8 +3,12 @@ import { getMembers, getProducts, getTransactions } from "@/actions/transaction"
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionList } from "@/components/TransactionList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SearchInput } from "@/components/SearchInput";
+import { Pagination } from "@/components/Pagination";
+import { CashierView } from "@/components/CashierView";
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: { searchParams: Promise<{ page?: string; search?: string }> }) {
+    const searchParams = await props.searchParams;
     const session = await getSession();
 
     if (!session) return null; // Handled in layout
@@ -20,28 +24,26 @@ export default async function DashboardPage() {
         const { data: members } = await getMembers(session.organizationId as string);
         const { data: products } = await getProducts(session.organizationId as string);
 
-        const { data: transactions } = await getTransactions(session.organizationId as string);
+        const page = parseInt(searchParams?.page || "1");
+        const search = searchParams?.search || "";
+
+        const { data: transactions, meta } = await getTransactions(
+            session.organizationId as string,
+            page,
+            search
+        );
 
         // Filter products for dropdown (or pass logic to component)
         // TransactionForm expects plain products.
 
         return (
-            <div className="space-y-6">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Kasir (POS)</h2>
-                    <p className="text-muted-foreground">Catat transaksi baru.</p>
-                </div>
-                <TransactionForm
-                    organizationId={session.organizationId as string}
-                    members={members}
-                    products={products}
-                />
-
-                <div className="mt-8">
-                    <h3 className="text-xl font-semibold mb-4">Riwayat Transaksi Terakhir</h3>
-                    <TransactionList transactions={transactions} />
-                </div>
-            </div>
+            <CashierView
+                initialMembers={members}
+                initialProducts={products}
+                initialTransactions={transactions}
+                transactionMeta={meta}
+                organizationId={session.organizationId as string}
+            />
         );
     }
 

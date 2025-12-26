@@ -40,13 +40,17 @@ interface DashboardSidebarProps {
     organizationType: string;
     navItems: NavItem[];
     logoutAction: () => Promise<void>;
+    userEmail: string;
+    userRole: string;
 }
 
 export function DashboardSidebar({
     organizationName,
     organizationType,
     navItems,
-    logoutAction
+    logoutAction,
+    userEmail,
+    userRole
 }: DashboardSidebarProps) {
     const pathname = usePathname();
 
@@ -83,6 +87,14 @@ export function DashboardSidebar({
                 })}
             </nav>
             <div className="p-4 border-t border-slate-800">
+                <div className="mb-4 px-2">
+                    <p className="text-sm font-medium text-slate-200 truncate" title={userEmail}>
+                        {userEmail}
+                    </p>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider">
+                        {userRole}
+                    </p>
+                </div>
                 <form action={logoutAction}>
                     <Button variant="ghost" className="w-full justify-start text-red-400 hover:bg-red-900/20 hover:text-red-300">
                         <LogOut className="mr-2 h-4 w-4" />

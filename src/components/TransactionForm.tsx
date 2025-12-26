@@ -87,7 +87,7 @@ export function TransactionForm({ organizationId, members, products }: Transacti
     }
 
     return (
-        <Card className="w-full max-w-2xl">
+        <Card className="w-full">
             <CardHeader>
                 <CardTitle>New Transaction</CardTitle>
             </CardHeader>
