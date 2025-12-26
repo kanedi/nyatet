@@ -36,6 +36,7 @@ export async function login(prevState: any, formData: FormData) {
             email: user.email,
             role: user.role,
             organizationId: user.organizationId,
+            organizationName: user.organization.name,
             organizationType: user.organization.type,
         });
 
